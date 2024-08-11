@@ -5,10 +5,12 @@
     "graphql": "^16.9.0"
   },
   "scripts": {
-    "start-server": "node develop/server/server.js",
-    "start-client": "cd client && npm start",
+    "start-server": "cd Develop/server && npm start",
+    "start-client": "cd Develop/client && npm start",
     "start": "concurrently \"npm run start-server\" \"npm run start-client\"",
     "test": "echo \"Write tests!\" && exit 0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
-  
 }
