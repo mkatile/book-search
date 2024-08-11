@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "@apollo/client": "^3.11.4",
+    "apollo-server-express": "^3.13.0",
+    "graphql": "^16.9.0"
+  },
+  "scripts": {
+    "start-server": "node develop/server/server.js",
+    "start-client": "cd client && npm start",
+    "start": "concurrently \"npm run start-server\" \"npm run start-client\"",
+    "test": "echo \"Write tests!\" && exit 0"
+  }
+  
+}
