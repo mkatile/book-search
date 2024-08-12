@@ -7,7 +7,7 @@ const { typeDefs, resolvers } = require('./schemas');
 const db = require('./config/connection');
 const { authMiddleware } = require('./utils/auth');
 const app = express();
-const PORT = process.env.PORT || 3004;
+const PORT = process.env.PORT || 4000;
 
 const server = new ApolloServer({
   typeDefs,

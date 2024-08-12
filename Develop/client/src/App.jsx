@@ -5,7 +5,7 @@ import Navbar from './components/Navbar';
 
 // Create an HTTP link to connect to your Apollo Server
 const httpLink = new HttpLink({
-  uri: 'http://localhost:3004/graphql', 
+  uri: 'http://localhost:4000/graphql', 
 });
 
 // Optional: Add authentication or other middleware if needed
