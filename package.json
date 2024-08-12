@@ -8,7 +8,7 @@
   "scripts": {
     "start-server": "cd Develop/server && npm start",
     "start-client": "cd Develop/client && npm start",
-    "start": "node ./node_modules/.bin/concurrently \"npm run start-server\" \"npm run start-client\"",
+    "start": "npx concurrently \"npm run start-server\" \"npm run start-client\"",
     "test": "echo \"Write tests!\" && exit 0"
   },
   "devDependencies": {
