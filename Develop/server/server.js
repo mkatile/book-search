@@ -12,6 +12,7 @@ const server = new ApolloServer({
   resolvers,
   context: authMiddleware,
   introspection: true,  // Ensure introspection is enabled
+  persistedQueries: false
 });
 
 const startServer = async () => {
