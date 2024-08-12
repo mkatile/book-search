@@ -34,8 +34,8 @@ const startServer = async () => {
   });
 
   db.once('open', () => {
-    app.listen(PORT, () => {
-      console.log(`🌍 Now listening on localhost:${PORT}`);
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`🌍 Now listening on 0.0.0.0:${PORT}`);
       console.log(`🚀 GraphQL server ready at http://localhost:${PORT}${server.graphqlPath}`);
     });
   });
