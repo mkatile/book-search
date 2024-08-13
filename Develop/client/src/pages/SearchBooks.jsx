@@ -61,33 +61,36 @@ const SearchBooks = () => {
 
   // Create function to handle saving a book to our database
   const handleSaveBook = async (bookId) => {
-    // Find the book in `searchedBooks` state by the matching id
     const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
-    // Get token
+    console.log('Book to Save:', bookToSave);
+  
     const token = Auth.loggedIn() ? Auth.getToken() : null;
-
+  
     if (!token) {
       console.error('No token found, user is not logged in');
       return false;
     }
-
+  
     try {
-      // Execute the saveBook mutation
       const { data } = await saveBook({
-        variables: { newBook: bookToSave }, // Adjust this based on your mutation's expected variables
+        variables: { newBook: bookToSave },
+        context: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
       });
-
-    
+  
+      console.log('Mutation Response Data:', data);
+  
       if (data) {
-        // If book successfully saves to user's account, save book id to state
         setSavedBookIds([...savedBookIds, bookToSave.bookId]);
       }
     } catch (err) {
       console.error('Error saving book:', err.message);
-      // Optionally, show user feedback about the error
     }
   };
-
+  
   return (
     <>
       <div className="text-light bg-dark p-5">
