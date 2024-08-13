@@ -5,11 +5,11 @@ import { ADD_USER } from '../utils/mutations';
 import Auth from '../utils/auth';
 
 const SignupForm = () => {
-  // set initial form state
+  // Set initial form state
   const [userFormData, setUserFormData] = useState({ username: '', email: '', password: '' });
-  // set state for form validation
-  const [validated] = useState(false);
-  // set state for alert
+  // Set state for form validation
+  const [validated, setValidated] = useState(false);
+  // Set state for alert
   const [showAlert, setShowAlert] = useState(false);
 
   // Use useMutation hook to execute ADD_USER mutation
@@ -22,12 +22,13 @@ const SignupForm = () => {
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
-
-    // check if form has everything (as per react-bootstrap docs)
     const form = event.currentTarget;
+
+    // Check if form is valid
     if (form.checkValidity() === false) {
-      event.preventDefault();
       event.stopPropagation();
+      setValidated(true);
+      return;
     }
 
     try {
@@ -36,28 +37,33 @@ const SignupForm = () => {
         variables: { ...userFormData },
       });
 
-      const { token } = data.addUser;
+      // Ensure the data contains the expected structure
+      if (data && data.addUser) {
+        const { token } = data.addUser;
 
-      // log user in
-      Auth.login(token);
+        // Log user in
+        Auth.login(token);
 
+        // Clear form data
+        setUserFormData({
+          username: '',
+          email: '',
+          password: '',
+        });
+
+        setValidated(true);
+      } else {
+        throw new Error('Unexpected response structure from mutation');
+      }
     } catch (err) {
-      console.error(err);
+      console.error('Error during signup:', err);
       setShowAlert(true);
     }
-
-    setUserFormData({
-      username: '',
-      email: '',
-      password: '',
-    });
   };
 
   return (
     <>
-      {/* This is needed for the validation functionality above */}
       <Form noValidate validated={validated} onSubmit={handleFormSubmit}>
-        {/* show alert if server response is bad */}
         <Alert dismissible onClose={() => setShowAlert(false)} show={showAlert} variant='danger'>
           Something went wrong with your signup!
         </Alert>
@@ -65,6 +71,7 @@ const SignupForm = () => {
         <Form.Group className='mb-3'>
           <Form.Label htmlFor='username'>Username</Form.Label>
           <Form.Control
+            id='username'
             type='text'
             placeholder='Your username'
             name='username'
@@ -78,6 +85,7 @@ const SignupForm = () => {
         <Form.Group className='mb-3'>
           <Form.Label htmlFor='email'>Email</Form.Label>
           <Form.Control
+            id='email'
             type='email'
             placeholder='Your email address'
             name='email'
@@ -91,6 +99,7 @@ const SignupForm = () => {
         <Form.Group className='mb-3'>
           <Form.Label htmlFor='password'>Password</Form.Label>
           <Form.Control
+            id='password'
             type='password'
             placeholder='Your password'
             name='password'
@@ -100,6 +109,7 @@ const SignupForm = () => {
           />
           <Form.Control.Feedback type='invalid'>Password is required!</Form.Control.Feedback>
         </Form.Group>
+
         <Button
           disabled={!(userFormData.username && userFormData.email && userFormData.password)}
           type='submit'
@@ -112,4 +122,3 @@ const SignupForm = () => {
 };
 
 export default SignupForm;
-

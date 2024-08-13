@@ -32,12 +32,16 @@ const SearchBooks = () => {
 
     try {
       const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${searchInput}`);
-      
+
       if (!response.ok) {
-        throw new Error('Something went wrong!');
+        throw new Error('Something went wrong with the Google Books API!');
       }
 
       const { items } = await response.json();
+
+      if (!items) {
+        throw new Error('No books found!');
+      }
 
       const bookData = items.map((book) => ({
         bookId: book.id,
@@ -50,7 +54,8 @@ const SearchBooks = () => {
       setSearchedBooks(bookData);
       setSearchInput('');
     } catch (err) {
-      console.error(err);
+      console.error('Error fetching books:', err);
+      // Optionally, show user feedback about the error
     }
   };
 
@@ -62,21 +67,24 @@ const SearchBooks = () => {
     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
     if (!token) {
+      console.error('No token found, user is not logged in');
       return false;
     }
 
     try {
       // Execute the saveBook mutation
-      const { data } = await saveBookMutation({
+      const { data } = await saveBook({
         variables: { newBook: bookToSave }, // Adjust this based on your mutation's expected variables
       });
 
+    
       if (data) {
         // If book successfully saves to user's account, save book id to state
         setSavedBookIds([...savedBookIds, bookToSave.bookId]);
       }
     } catch (err) {
       console.error('Error saving book:', err.message);
+      // Optionally, show user feedback about the error
     }
   };
 

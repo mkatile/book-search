@@ -1,3 +1,4 @@
+const { GraphQLError } = require('graphql');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User'); // Ensure the correct path to your User model
 
@@ -5,32 +6,37 @@ const User = require('../models/User'); // Ensure the correct path to your User 
 const secret = 'mysecretsshhhhh';
 const expiration = '2h';
 
-const authMiddleware = async ({ req }) => {
-  // Check for token in the headers
-  let token = req.headers.authorization || '';
+module.exports = {
+  AuthenticationError: new GraphQLError('Could not authenticate user.', {
+    extensions: {
+      code: 'UNAUTHENTICATED',
+    },
+  }),
+  authMiddleware: function ({ req }) {
+    // allows token to be sent via req.body, req.query, or headers
+    let token = req.body.token || req.query.token || req.headers.authorization;
 
-  // Bearer token prefix is optional
-  if (token.startsWith('Bearer ')) {
-    token = token.slice(7, token.length).trimLeft();
-  }
+    // ["Bearer", "<tokenvalue>"]
+    if (req.headers.authorization) {
+      token = token.split(' ').pop().trim();
+    }
 
-  // If no token, skip user authentication
-  if (!token) {
-    return { user: null };
-  }
+    if (!token) {
+      return req;
+    }
 
-  try {
-    // Decode and verify the token
-    const { data } = jwt.verify(token, secret, { maxAge: expiration });
-    
-    // Find and return the user associated with the token
-    const user = await User.findById(data._id).exec();
-    
-    return { user };
-  } catch (err) {
-    console.error('Invalid token', err);
-    return { user: null };
-  }
+    try {
+      const { data } = jwt.verify(token, secret, { maxAge: expiration });
+      req.user = data;
+    } catch {
+      console.log('Invalid token');
+    }
+
+    return req;
+  },
+  signToken: function ({ firstName, email, _id }) {
+    const payload = { firstName, email, _id };
+
+    return jwt.sign({ data: payload }, secret, { expiresIn: expiration });
+  },
 };
-
-module.exports = { authMiddleware };

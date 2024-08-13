@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import {
   Container,
@@ -20,15 +19,10 @@ const SavedBooks = () => {
   // Use useMutation to execute REMOVE_BOOK mutation
   const [removeBook] = useMutation(REMOVE_BOOK);
 
-  // Check if data is still loading
-  if (loading) {
-    return <h2>LOADING...</h2>;
-  }
-
-  // Get user data from query result
+  // Access user data from query result
   const userData = data?.me || {};
 
-  // Handle deleting a book
+  // Function to handle book deletion
   const handleDeleteBook = async (bookId) => {
     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
@@ -39,17 +33,25 @@ const SavedBooks = () => {
     try {
       const { data } = await removeBook({
         variables: { bookId },
+        context: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
       });
 
+      // Update localStorage after successful deletion
       if (data) {
-        // Upon success, remove book's id from localStorage
         removeBookId(bookId);
-        // Optionally, refetch user data or use the updated userData
       }
     } catch (err) {
       console.error(err);
     }
   };
+
+  if (loading) {
+    return <h2>LOADING...</h2>;
+  }
 
   return (
     <>
