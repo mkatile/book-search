@@ -1,42 +1,36 @@
 import React from 'react';
-import { ApolloProvider, InMemoryCache, HttpLink, ApolloLink } from '@apollo/client';
+import { ApolloProvider, InMemoryCache, createHttpLink, ApolloClient } from '@apollo/client';
+
 import { Outlet } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import { setContext } from '@apollo/client/link/context';
 
 // Create an HTTP link to connect to your Apollo Server
-const httpLink = new HttpLink({
-  uri: 'http://localhost:4000/graphql', 
+const httpLink = createHttpLink({
+  uri: '/graphql', 
 });
 
-// Optional: Add authentication or other middleware if needed
-const authLink = new ApolloLink((operation, forward) => {
-  // Retrieve the authentication token from local storage
-  const token = localStorage.getItem('token');
-  
-  // Use the token if it exists
-  operation.setContext({
+const authLink = setContext((_, { headers }) => {
+  const token = localStorage.getItem('id_token');
+  return {
     headers: {
+      ...headers,
       authorization: token ? `Bearer ${token}` : '',
     },
-  });
-
-  return forward(operation);
+  };
 });
-
-// Combine the authentication link with the HTTP link
-const link = authLink.concat(httpLink);
 
 // Create the Apollo Client instance
 const client = new ApolloClient({
+  link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
-  link: link,
 });
 
 function App() {
   return (
     <ApolloProvider client={client}>
       <Navbar />
-      <Outlet />
+      <Outlet/>
     </ApolloProvider>
   );
 }
