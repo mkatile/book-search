@@ -12,8 +12,8 @@ module.exports = {
       code: 'UNAUTHENTICATED',
     },
   }),
-  authMiddleware: function ({ req }) {
-    // allows token to be sent via req.body, req.query, or headers
+  authMiddleware: async function ({ req }) {
+    // Allows token to be sent via req.body, req.query, or headers
     let token = req.body.token || req.query.token || req.headers.authorization;
 
     // ["Bearer", "<tokenvalue>"]
@@ -22,17 +22,21 @@ module.exports = {
     }
 
     if (!token) {
-      return req;
+      return { user: null };
     }
 
     try {
-      const { data } = jwt.verify(token, secret, { maxAge: expiration });
-      req.user = data;
-    } catch {
-      console.log('Invalid token');
-    }
+      // Verify token and extract user data
+      const { data } = jwt.verify(token, secret);
+      
+      // Find the user by ID (if you need to access user details)
+      const user = await User.findById(data._id).select('-__v');
 
-    return req;
+      return { user };
+    } catch (err) {
+      console.error('Invalid token', err);
+      return { user: null };
+    }
   },
   signToken: function ({ firstName, email, _id }) {
     const payload = { firstName, email, _id };

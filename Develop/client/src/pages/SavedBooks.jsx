@@ -15,13 +15,12 @@ import { removeBookId } from '../utils/localStorage';
 const SavedBooks = () => {
   // Use useQuery to fetch user data directly
   const { data, loading } = useQuery(GET_ME);
-  
   // Use useMutation to execute REMOVE_BOOK mutation
   const [removeBook] = useMutation(REMOVE_BOOK);
 
   // Access user data from query result
   const userData = data?.me || {};
-
+  
   // Function to handle book deletion
   const handleDeleteBook = async (bookId) => {
     const token = Auth.loggedIn() ? Auth.getToken() : null;

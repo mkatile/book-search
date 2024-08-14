@@ -32,14 +32,16 @@ const LoginForm = () => {
       const { data } = await loginUser({
         variables: { ...userFormData },
       });
+      console.log('Mutation response data:', data); // Inspect the data
 
-      const { token } = data.loginUser;
-
-      // Log user in
-      Auth.login(token);
-
+      if (data && data.login) {
+        const { token } = data.login;
+        Auth.login(token);
+      } else {
+        console.error('Unexpected response structure:', data);
+      }
     } catch (err) {
-      console.error(err);
+      console.error('Error during login:', err); // More detailed error logging
       setShowAlert(true);
     }
 

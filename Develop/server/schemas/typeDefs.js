@@ -31,7 +31,9 @@ const typeDefs = gql`
     image: String
     link: String
   }
-
+  type Mutation {
+  saveBook(newBook: InputBook!): User
+}
   type Query {
     me: User
     searchBooks(title: String!): [Book]  # Added the searchBooks query here

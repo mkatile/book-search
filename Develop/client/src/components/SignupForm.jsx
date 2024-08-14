@@ -37,6 +37,7 @@ const SignupForm = () => {
         variables: { ...userFormData },
       });
 
+    
       // Ensure the data contains the expected structure
       if (data && data.addUser) {
         const { token } = data.addUser;
@@ -56,7 +57,7 @@ const SignupForm = () => {
         throw new Error('Unexpected response structure from mutation');
       }
     } catch (err) {
-      console.error('Error during signup:', err);
+      console.error('Error during signup:', err.message);
       setShowAlert(true);
     }
   };
